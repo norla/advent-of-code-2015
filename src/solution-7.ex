@@ -5,6 +5,7 @@ defmodule Solution7 do
   def run do
     input = IO.read(:stdio, :all) |> String.strip |> String.split("\n")
     cmds1 = input |> Enum.map(&parse/1)
+    IO.inspect(cmds1)
     a1 = resolve_all(cmds1) |> Dict.get("a")
     cmds2 = List.keyreplace(cmds1, "b", 2, {[], a1, "b"})
     a2 = resolve_all(cmds2) |> Dict.get("a")
@@ -20,21 +21,22 @@ defmodule Solution7 do
 
   def parse(cmd) do
 		[input, output] = cmd |> String.strip |> String.split(" -> ")
-		case String.split(input) do
-      ["1", "AND", y] -> {[y], {"AND", 1}, output}
-			[x, "AND", y] -> {[x, y], "AND", output}
-      [x, "OR", y] -> {[x, y], "OR", output}
-      [wire, "RSHIFT", n] -> {[wire], {"BSR", String.to_integer(n)}, output}
-      [wire, "LSHIFT", n] -> {[wire], {"BSL", String.to_integer(n)}, output}
-			["NOT", wire] -> {[wire], "NOT", output}
-			[x] ->
-        if Regex.match?(~r/\d+/, x) do
-          {[], String.to_integer(x), output}
-        else
-          {[x], "ID", output}
-        end
-		end
+		{args, op} = case String.split(input) do
+                   [x, op, y] -> {[x, y], op}
+			             [op, x] -> {[x], op}
+			             [x] -> {[x], "ID"}
+                 end
+    cmd = %{:out => output, :deps => [], :args => [], :op => op}
+    Enum.reduce(args, cmd, &init_cmd/2)
 	end
+
+  def init_cmd(x, cmd) do
+    if Regex.match?(~r/\d+/, x) do
+      %{cmd | :args => [String.to_integer(x) | cmd.args]}
+    else
+      %{cmd | :deps => [x | cmd.deps]}
+    end
+  end
 
 	def resolve(cmd = {inputs, op, output}, {unresolved, resolved}) do
     met = inputs |> Enum.map(&Dict.get(resolved, &1)) |> Enum.filter(fn(x) -> x !== nil end)
