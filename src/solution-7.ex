@@ -5,18 +5,18 @@ defmodule Solution7 do
   def run do
     input = IO.read(:stdio, :all) |> String.strip |> String.split("\n")
     cmds1 = input |> Enum.map(&parse/1)
-    IO.inspect(cmds1)
-    a1 = resolve_all(cmds1) |> Dict.get("a")
-    cmds2 = List.keyreplace(cmds1, "b", 2, {[], a1, "b"})
-    a2 = resolve_all(cmds2) |> Dict.get("a")
+    a1 = resolve_key(cmds1, "a")
+    cmds2 = Enum.map(cmds1,
+      fn(cmd = %{:out => "b"}) -> %{cmd | :args => [a1], :deps => []}
+        (x) -> x
+      end)
+    a2 = resolve_key(cmds2, "a")
     IO.inspect([part1: a1, part2: a2])
   end
 
-  def resolve_all(cmds, res \\ HashDict.new) do
-    case Enum.reduce(cmds, {[], res}, &resolve/2) do
-      {[], newRes} -> newRes
-      {newCmds, newRes} -> resolve_all(newCmds, newRes)
-    end
+  def resolve_key(cmds, key, resolved \\ HashDict.new) do
+    {cmds, resolved} = Enum.reduce(cmds, {[], resolved}, &resolve/2)
+    if res = Dict.get(resolved, key), do: res, else: resolve_key(cmds, key, resolved)
   end
 
   def parse(cmd) do
@@ -38,21 +38,20 @@ defmodule Solution7 do
     end
   end
 
-	def resolve(cmd = {inputs, op, output}, {unresolved, resolved}) do
-    met = inputs |> Enum.map(&Dict.get(resolved, &1)) |> Enum.filter(fn(x) -> x !== nil end)
-		case length(met) === length(inputs) do
-      true -> {unresolved, Dict.put(resolved, output, apply_op(op, met))}
-			_ -> {[cmd | unresolved], resolved}
+	def resolve(cmd, {cmds, resolved}) do
+    met = cmd.deps |> Enum.map(&Dict.get(resolved, &1)) |> Enum.filter(fn(x) -> x !== nil end)
+		if length(cmd.deps) == length(met)  do
+      {cmds, Dict.put(resolved, cmd.out, apply_op(%{cmd | :args => met ++ cmd.args}))}
+    else
+      {[cmd | cmds], resolved}
     end
   end
 
-  def apply_op("AND", [x, y]), do: x &&& y
-  def apply_op({"AND", x}, [y]), do: x &&& y
-  def apply_op("OR", [x, y]), do: x ||| y
-  def apply_op("NOT", [x]), do: ~~~x
-  def apply_op("ID", [x]), do: x
-  def apply_op({"BSR", n}, [x]), do: bsr(x, n)
-  def apply_op({"BSL", n}, [x]), do: bsl(x, n)
-  def apply_op(signal, []) when is_integer(signal), do: signal
+  def apply_op(%{:op => "AND", :args => [x, y]}), do: x &&& y
+  def apply_op(%{:op => "OR", :args => [x, y]}), do: x ||| y
+  def apply_op(%{:op => "RSHIFT", :args => [x, y]}), do: bsr(x, y)
+  def apply_op(%{:op => "LSHIFT", :args => [x, y]}), do: bsl(x, y)
+  def apply_op(%{:op => "NOT", :args => [x]}), do: ~~~x
+  def apply_op(%{:op => "ID", :args => [x]}), do: x
 
 end
