@@ -23,8 +23,8 @@ defmodule Solution7 do
     [input, output] = cmd |> String.strip |> String.split(" -> ")
     {args, op} = case String.split(input) do
                    [x, op, y] -> {[x, y], op}
-			             [op, x] -> {[x], op}
-			             [x] -> {[x], "ID"}
+                   [op, x] -> {[x], op}
+                   [x] -> {[x], "ID"}
                  end
     cmd = %{:out => output, :deps => [], :args => [], :op => op}
     Enum.reduce(args, cmd, &init_cmd/2)
@@ -38,9 +38,9 @@ defmodule Solution7 do
     end
   end
 
-	def resolve(cmd, {cmds, resolved}) do
+  def resolve(cmd, {cmds, resolved}) do
     met = cmd.deps |> Enum.map(&Dict.get(resolved, &1)) |> Enum.filter(fn(x) -> x !== nil end)
-		if length(cmd.deps) == length(met)  do
+    if length(cmd.deps) == length(met)  do
       {cmds, Dict.put(resolved, cmd.out, apply_op(%{cmd | :args => met ++ cmd.args}))}
     else
       {[cmd | cmds], resolved}
