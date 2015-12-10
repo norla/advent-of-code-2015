@@ -20,8 +20,8 @@ defmodule Solution7 do
   end
 
   def parse(cmd) do
-		[input, output] = cmd |> String.strip |> String.split(" -> ")
-		{args, op} = case String.split(input) do
+    [input, output] = cmd |> String.strip |> String.split(" -> ")
+    {args, op} = case String.split(input) do
                    [x, op, y] -> {[x, y], op}
 			             [op, x] -> {[x], op}
 			             [x] -> {[x], "ID"}
