@@ -9,7 +9,7 @@ defmodule Solution11 do
 
   def next_pwd(pwd) do
     next = inc(pwd)
-    if check(next, %{pairs, 0, straight: 0}), do: next, else: next_pwd(next)
+    if check(next, %{pairs: 0, straight: 0}), do: next, else: next_pwd(next)
   end
 
   def check(<<>>, state), do: state.pairs > 1 && state.straight > 0
@@ -17,7 +17,7 @@ defmodule Solution11 do
   def check(<<x, x, x, tail::binary>>, state) do
     check(<<x, tail::binary>>, %{state | pairs: state.pairs + 1})
   end
-  def check(<<x, y, tail::binary>>, state) do
+  def check(<<x, x, tail::binary>>, state) do
     check(<<x, tail::binary>>, %{state | pairs: state.pairs + 1})
   end
   def check(<<x, y , z, tail::binary>>, state) when (y == x + 1 and z == y + 1) do
