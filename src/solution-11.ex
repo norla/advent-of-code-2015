@@ -14,10 +14,10 @@ defmodule Solution11 do
 
   def check(<<>>, state), do: state.pairs > 1 && state.straight > 0
   def check(<<x, _::binary>>, _) when (x == ?l or x == ?o or x == ?l), do: false
-  def check(<<x, x, x, tail::binary>>, state)  when x == x do
+  def check(<<x, x, x, tail::binary>>, state) do
     check(<<x, tail::binary>>, %{state | pairs: state.pairs + 1})
   end
-  def check(<<x, y, tail::binary>>, state) when x == y do
+  def check(<<x, y, tail::binary>>, state) do
     check(<<x, tail::binary>>, %{state | pairs: state.pairs + 1})
   end
   def check(<<x, y , z, tail::binary>>, state) when (y == x + 1 and z == y + 1) do
