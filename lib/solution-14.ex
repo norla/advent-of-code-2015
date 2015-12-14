@@ -17,15 +17,13 @@ defmodule Solution14 do
   end
 
   def score(secs, deer) do
-    list = deer |> Enum.map(&distance(&1, secs)) |> Enum.zip(deer) |> rsort
-    {maxDist, _} = List.first(list)
-    leaders = Enum.take_while(list, fn({dist, _}) -> dist == maxDist end)
+    {_, leaders} = deer |> Enum.map(&distance(&1, secs)) |> Enum.zip(deer)
+    |> Enum.group_by(fn({dist, _}) -> dist end) |> Enum.sort |> List.last
     leaders |> Enum.reduce(
       deer, fn({_, {key, d}}, acc) -> Dict.put(acc, key, %{d | score: d.score + 1}) end)
   end
 
   def to_i(x), do: String.to_integer(x)
   def top(list), do: list |> Enum.sort |> List.last
-  def rsort(list), do: list |> Enum.sort |> Enum.reverse
 
 end
