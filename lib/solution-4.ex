@@ -9,5 +9,5 @@ defmodule Solution4 do
     md5 = :crypto.hash(:md5, "#{key}#{n}") |> Base.encode16
     if String.starts_with?(md5, prefix), do: n, else: find(key, n + 1, prefix)
   end
-  
+
 end

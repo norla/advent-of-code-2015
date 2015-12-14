@@ -1,10 +1,9 @@
 defmodule Solution14 do
 
   def run do
-    input = IO.read(:stdio, :all) |> String.strip |> String.split("\n")
-    reindeers = input |> Enum.reduce(HashDict.new(), &parse/2)
-    res1 = Enum.map(reindeers, &distance(&1, 2503)) |> top
-    res2 = 1..2503 |> Enum.reduce(reindeers, &score/2) |> Enum.map(fn({_, x}) -> x.score end) |> top
+    deer = IO.stream(:stdio, :line) |> Enum.reduce(HashDict.new(), &parse/2)
+    res1 = Enum.map(deer, &distance(&1, 2503)) |> top
+    res2 = 1..2503 |> Enum.reduce(deer, &score/2) |> Enum.map(fn({_, x}) -> x.score end) |> top
     IO.inspect([part1: res1, part2: res2])
   end
 
@@ -17,14 +16,12 @@ defmodule Solution14 do
     div(secs, fly + rest) * speed * fly + min(fly, rem(secs, fly + rest)) * speed
   end
 
-  def score(secs, reindeers) do
-    list = reindeers |> Enum.map(&distance(&1, secs)) |> Enum.zip(reindeers) |> rsort
+  def score(secs, deer) do
+    list = deer |> Enum.map(&distance(&1, secs)) |> Enum.zip(deer) |> rsort
     {maxDist, _} = List.first(list)
     leaders = Enum.take_while(list, fn({dist, _}) -> dist == maxDist end)
-    leaders |> Enum.reduce(reindeers,
-      fn({_, {key, reindeer}}, acc) ->
-        Dict.put(acc, key, %{reindeer | score: reindeer.score + 1})
-      end)
+    leaders |> Enum.reduce(
+      deer, fn({_, {key, d}}, acc) -> Dict.put(acc, key, %{d | score: d.score + 1}) end)
   end
 
   def to_i(x), do: String.to_integer(x)

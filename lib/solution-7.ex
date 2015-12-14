@@ -3,15 +3,11 @@ defmodule Solution7 do
   use Bitwise
 
   def run do
-    input = IO.read(:stdio, :all) |> String.strip |> String.split("\n")
-    cmds1 = input |> Enum.map(&parse/1)
-    a1 = resolve_key(cmds1, "a")
+    cmds1 = IO.stream(:stdio, :line) |> Enum.map(&parse/1)
+    a = resolve_key(cmds1, "a")
     cmds2 = Enum.map(cmds1,
-      fn(cmd = %{:out => "b"}) -> %{cmd | :args => [a1], :deps => []}
-        (x) -> x
-      end)
-    a2 = resolve_key(cmds2, "a")
-    IO.inspect([part1: a1, part2: a2])
+      fn(cmd = %{out: "b"}) -> %{cmd | args: [a], deps: []}; (x) -> x end)
+    IO.inspect([part1: a, part2: resolve_key(cmds2, "a")])
   end
 
   def resolve_key(cmds, key, resolved \\ HashDict.new) do
@@ -40,7 +36,7 @@ defmodule Solution7 do
 
   def resolve(cmd, {cmds, resolved}) do
     met = cmd.deps |> Enum.map(&Dict.get(resolved, &1)) |> Enum.filter(fn(x) -> x !== nil end)
-    if length(cmd.deps) == length(met)  do
+    if length(cmd.deps) == length(met) do
       {cmds, Dict.put(resolved, cmd.out, apply_op(%{cmd | :args => met ++ cmd.args}))}
     else
       {[cmd | cmds], resolved}

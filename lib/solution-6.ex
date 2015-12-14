@@ -18,7 +18,6 @@ defmodule Solution6 do
   end
 
   def doCmd(cmd = {_, _, startY, _, endY}, lights, bulbFn) do
-    IO.inspect(cmd)
     map_range(lights, startY, endY, fn(row) -> doRow(cmd, row, bulbFn) end)
   end
 

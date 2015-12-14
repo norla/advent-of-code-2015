@@ -1,7 +1,7 @@
 defmodule Solution8 do
 
   def run do
-    input = IO.read(:stdio, :all) |> String.strip |> String.split("\n")
+    input = IO.stream(:stdio, :line) |> Enum.into([])
     res1 = input |> Enum.map(&cnt/1) |> Enum.sum
     res2 = input |> Enum.map(&cnt2/1) |> Enum.sum
     IO.inspect([part1: res1, part2: res2])
