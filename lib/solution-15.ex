@@ -13,7 +13,8 @@ defmodule Solution15 do
   end
 
   def parse(line) do
-     Regex.scan(~r/(-*\d+)/, line, [capture: :first]) |> List.flatten |> Enum.map(&String.to_integer/1)
+    Regex.scan(~r/(-*\d+)/, line, [capture: :first])
+    |> List.flatten |> Enum.map(&String.to_integer/1)
   end
 
   def score(cookie, ingredients) do

@@ -22,10 +22,8 @@ defmodule Solution16 do
   def sue_1?({sue, _}), do: sue -- @gifter == []
 
   def sue_2?({sue, n}) do
-    (!sue[:cats] || sue[:cats] > @gifter[:cats]) &&
-    (!sue[:trees] || sue[:trees] > @gifter[:trees]) &&
-    (!sue[:pomeranians] || sue[:pomeranians] < @gifter[:pomeranians]) &&
-    (!sue[:goldfish] || sue[:goldfish] < @gifter[:goldfish]) &&
+    [:cats, :trees] |> all?(fn(p) -> !sue[p] || sue[p] > @gifter[p] end) &&
+    [:pomeranians, :goldfish] |> all?(fn(p) -> !sue[p] || sue[p] < @gifter[p] end) &&
     sue_1?({[:cats, :trees, :pomeranians, :goldfish] |> reduce(sue, &Keyword.delete(&2, &1)), n})
   end
 
