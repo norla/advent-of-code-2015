@@ -6,7 +6,7 @@ defmodule Solution20 do
 
   def run(fun) do
     1..2900000
-    |> Enum.reduce(HashDict.new, fn(house, houses) ->
+    |> Enum.reduce(:ets.new(:houses, []), fn(house, houses) ->
       if (rem(house, 100) == 0), do: IO.puts("#{house}")
       fun.(house, house, houses)
     end)
@@ -20,7 +20,7 @@ defmodule Solution20 do
   def elf_2(n, house, houses) when n > (house * 50), do: houses
   def elf_2(n, house, houses), do: elf_2(n + house, house, gift(houses, n, house * 11))
 
-  def gift(houses, house, gifts), do: Dict.update(houses, house, gifts, &(&1 + gifts))
+  def gift(houses, house, gifts), do: :ets.update_counter(houses, house, gifts, {house, gifts})
 
 end
 
