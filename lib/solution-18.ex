@@ -32,6 +32,5 @@ defmodule Solution18 do
 
   def do_light({{x, y}, 0}, lights), do: if (surround(x, y, lights) == 3), do: 1, else: 0
   def do_light({{x, y}, 1}, lights), do: if (surround(x, y, lights) in [2, 3]), do: 1, else: 0
-
-  def do_light_2
+  
 end
